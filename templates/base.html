@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>  
+  <meta charset="utf-8">
+ <title>Full Stack Jedi | Blog</title>
+  <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+  <link type="text/css" rel="stylesheet" href="/css/main.css">
+  <script type="text/javascript" src="js/scripts.js"></script>
+  <script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+</head>
+
+<body>
+  <header class="navbar navbar-inverse">
+    <div class="navbar-inner">
+      <a class="brand" href="/blog">Full Stack Jedi | Blog</a>
+      <ul class="nav">
+        <li><a href="/">Home</a></li>
+        <li><a href="/blog">Blog</a></li>
+        <li><a href="/blog/newpost">New</a></li>
+      </ul>
+    </div>
+  </header>
+  <a href="/blog" class="main-title">
+    Full Stack Jedi Blog
+  </a>
+
+  <div class="login-area">
+    {% if user %}
+      {{user.name}} (<a class="login-link" href="/logout">logout</a>)
+    {% else %}
+      <a class="login-link" href="/login">login</a>
+      |
+      <a class="login-link" href="/signup">signup</a>
+    {% endif %}
+  </div>
+
+  <div id="content">
+  {% block content %}
+  {% endblock %}
+  </div>
+</body>
+
+</html>
+

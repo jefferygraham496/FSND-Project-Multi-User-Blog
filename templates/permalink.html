@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {{post.render() | safe}}
+  <form method="post">
+  	<label>
+    	<div>Comment</div>
+    	<textarea name="content">{{content}}</textarea>
+  	</label>
+  	<input type="submit" value="Comment">
+  	<input type="hidden" name="post_key" value="{{ post.key() }}">
+  </form>
+  <br>
+  Comments:
+  <br>
+  {% for c in comment %}
+    {{c.content | safe}}
+    <br>
+    <br>
+  {% endfor %}
+{% endblock %}

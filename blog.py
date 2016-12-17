@@ -207,7 +207,7 @@ class EditPost(BlogHandler):
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-        self.render("editpost.html", post = post)
+        self.render("editpost.html", subject=post.subject, content=post.content)
 
     def post(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())

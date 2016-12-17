@@ -64,9 +64,9 @@ def render_post(response, post):
     response.out.write('<b>' + post.subject + '</b><br>')
     response.out.write(post.content)
 
-class MainPage(BlogHandler):
+class HomePage(BlogHandler):
   def get(self):
-      self.write('Hello, Udacity!')
+      self.render('index.html')
 
 
 ##### user stuff
@@ -138,6 +138,9 @@ class Comment(db.Model):
     last_modified = db.DateTimeProperty(auto_now = True)
     user = db.StringProperty()
 
+    def render(self):
+        self._render_text = self.content.replace('\n', '<br>')
+        return render_str("comment.html", c = self)
         
 
 class BlogFront(BlogHandler):
@@ -153,8 +156,8 @@ class PostPage(BlogHandler):
         params = dict(post = post)
 
         if Comment.all():
-            comment = Comment.all().filter('post = ', key)
-            params['comment'] = comment
+            comments = db.GqlQuery("SELECT * FROM Comment ORDER BY created DESC")
+            params['comments'] = comments
 
         if self.user:
             params['username'] = self.user.name
@@ -193,12 +196,29 @@ class NewPost(BlogHandler):
         user = self.user.name
 
         if subject and content:
-            p = Post(parent = blog_key(), subject = subject, content = content, user = username)
+            p = Post(parent = blog_key(), subject = subject, content = content, user = user)
             p.put()
             self.redirect('/blog/%s' % str(p.key().id()))
         else:
             error = "subject and content, please!"
             self.render("newpost.html", subject=subject, content=content, error=error)
+
+class EditPost(BlogHandler):
+    def get(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        self.render("editpost.html", post = post)
+
+    def post(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        post.subject = self.request.get('subject')
+        post.content = self.request.get('content')
+        user = self.user.name
+
+        if post.subject and post.content:
+            post.put()
+        self.redirect('/blog/%s' % post_id)
 
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
@@ -291,10 +311,11 @@ class Welcome(BlogHandler):
         else:
             self.redirect('/signup')
 
-app = webapp2.WSGIApplication([('/', MainPage),
+app = webapp2.WSGIApplication([('/', HomePage),
                                ('/blog/?', BlogFront),
                                ('/blog/([0-9]+)', PostPage),
                                ('/blog/newpost', NewPost),
+                               ('/blog/([0-9]+)/edit', EditPost),
                                ('/signup', Register),
                                ('/login', Login),
                                ('/logout', Logout),

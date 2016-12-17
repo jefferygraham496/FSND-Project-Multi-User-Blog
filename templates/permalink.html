@@ -2,20 +2,23 @@
 
 {% block content %}
   {{post.render() | safe}}
-  <form method="post">
-  	<label>
-    	<div>Comment</div>
-    	<textarea name="content">{{content}}</textarea>
-  	</label>
-  	<input type="submit" value="Comment">
-  	<input type="hidden" name="post_key" value="{{ post.key() }}">
-  </form>
+  <br>
+  <br>
+  <a href="/blog/{{post.key().id()}}/edit">Edit Post</a>
   <br>
   Comments:
   <br>
-  {% for c in comment %}
+  {% for c in comments %}
     {{c.content | safe}}
     <br>
     <br>
   {% endfor %}
+
+  <form method="post">
+    <textarea name="content" placeholder="Write a comment">{{content}}</textarea>
+    <br>
+  	<input type="submit" value="Comment">
+  	<input type="hidden" name="post_key" value="{{ post.key() }}">
+  </form>
+
 {% endblock %}

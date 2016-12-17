@@ -7,9 +7,15 @@
     <div class="post-date">
       {{p.created.strftime("%b %d, %Y")}}
     </div>
+
+    <div class="post-author">
+      By {{p.user}}
+    </div>
   </div>
 
   <div class="post-content">
     {{p._render_text | safe}}
   </div>
+  <hr>
+  Like
 </div>

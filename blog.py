@@ -216,9 +216,34 @@ class EditPost(BlogHandler):
         post.content = self.request.get('content')
         user = self.user.name
 
-        if post.subject and post.content:
-            post.put()
-        self.redirect('/blog/%s' % post_id)
+        input = self.request.get('submit')
+
+        if input == 'Submit': 
+            if post.subject and post.content:
+                post.put()
+                self.redirect('/blog/%s' % post_id)
+        else:
+            self.redirect('/blog/%s' % post_id)
+
+class DeletePost(BlogHandler):
+    def get(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        self.render("deletepost.html", subject=post.subject, content=post.content)
+
+    def post(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+
+        input = self.request.get('submit')
+
+        if input == 'Delete':        
+            post.delete()
+            self.render('front.html')
+        else:
+            self.redirect('/blog/%s' % post_id)
+
+        
 
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
@@ -316,6 +341,7 @@ app = webapp2.WSGIApplication([('/', HomePage),
                                ('/blog/([0-9]+)', PostPage),
                                ('/blog/newpost', NewPost),
                                ('/blog/([0-9]+)/edit', EditPost),
+                               ('/blog/([0-9]+)/delete', DeletePost),
                                ('/signup', Register),
                                ('/login', Login),
                                ('/logout', Logout),

@@ -5,11 +5,14 @@
   <br>
   <br>
   <a href="/blog/{{post.key().id()}}/edit">Edit Post</a>
+  <a href="/blog/{{post.key().id()}}/delete">Delete Post</a>
   <br>
   Comments:
   <br>
   {% for c in comments %}
     {{c.content | safe}}
+    <br>
+    <a href="">Edit Comment</a>
     <br>
     <br>
   {% endfor %}

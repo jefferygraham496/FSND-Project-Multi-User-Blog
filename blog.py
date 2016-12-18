@@ -126,6 +126,8 @@ class Post(db.Model):
     created = db.DateTimeProperty(auto_now_add = True)
     last_modified = db.DateTimeProperty(auto_now = True)
     user = db.StringProperty()
+    likes = db.IntegerProperty()
+    unlikes = db.IntegerProperty()
 
     def render(self):
         self._render_text = self.content.replace('\n', '<br>')
@@ -196,7 +198,7 @@ class NewPost(BlogHandler):
         user = self.user.name
 
         if subject and content:
-            p = Post(parent = blog_key(), subject = subject, content = content, user = user)
+            p = Post(parent = blog_key(), subject = subject, content = content, user = user, likes = 0, unlikes = 0)
             p.put()
             self.redirect('/blog/%s' % str(p.key().id()))
         else:
@@ -243,8 +245,21 @@ class DeletePost(BlogHandler):
         else:
             self.redirect('/blog/%s' % post_id)
 
-        
+class LikePost(BlogHandler):
+    def get(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        post.likes += 1
+        post.put()
+        self.redirect('/blog/%s' % post_id)
 
+class UnlikePost(BlogHandler):
+    def get(self, post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        post.unlikes += 1
+        post.put()
+        self.redirect('/blog/%s' % post_id)
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -342,6 +357,8 @@ app = webapp2.WSGIApplication([('/', HomePage),
                                ('/blog/newpost', NewPost),
                                ('/blog/([0-9]+)/edit', EditPost),
                                ('/blog/([0-9]+)/delete', DeletePost),
+                               ('/blog/([0-9]+)/like', LikePost),
+                               ('/blog/([0-9]+)/unlike', UnlikePost),
                                ('/signup', Register),
                                ('/login', Login),
                                ('/logout', Logout),

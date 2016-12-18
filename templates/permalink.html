@@ -4,6 +4,9 @@
   {{post.render() | safe}}
   <br>
   <br>
+  <a href="/blog/{{post.key().id()}}/like">Like: </a> {{post.likes}}
+  <a href="/blog/{{post.key().id()}}/unlike">Unlike: </a> {{post.unlikes}}
+  <br>
   <a href="/blog/{{post.key().id()}}/edit">Edit Post</a>
   <a href="/blog/{{post.key().id()}}/delete">Delete Post</a>
   <br>
@@ -11,8 +14,6 @@
   <br>
   {% for c in comments %}
     {{c.content | safe}}
-    <br>
-    <a href="">Edit Comment</a>
     <br>
     <br>
   {% endfor %}

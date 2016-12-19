@@ -261,6 +261,45 @@ class UnlikePost(BlogHandler):
         post.put()
         self.redirect('/blog/%s' % post_id)
 
+class EditComment(BlogHandler):
+    def get(self, comment_id):
+        self.response.headers.add_header('Set-Cookie', 'referer=%s; Path=/' % self.request.referer)
+        comment = Comment.get_by_id(int(comment_id))
+        self.render('editcomment.html', content = comment.content)
+
+    def post(self, comment_id):
+        referer = str(self.request.cookies.get('referer'))
+        comment = Comment.get_by_id(int(comment_id))
+        comment.content = self.request.get('content')
+
+        input = self.request.get('submit')
+
+        if input == 'Submit': 
+            if comment.content:
+                comment.put()
+                self.redirect(referer)
+        else:
+            self.redirect(referer)
+
+class DeleteComment(BlogHandler):
+    def get(self, comment_id):
+        self.response.headers.add_header('Set-Cookie', 'referer=%s; Path=/' % self.request.referer)
+        comment = Comment.get_by_id(int(comment_id))
+        self.render('deletecomment.html', content = comment.content)
+
+    def post(self, comment_id):
+        referer = str(self.request.cookies.get('referer'))
+        comment = Comment.get_by_id(int(comment_id))
+        comment.content = self.request.get('content')
+
+        input = self.request.get('submit')
+
+        if input == 'Delete':        
+            comment.delete()
+            self.redirect(referer)
+        else:
+            self.redirect(referer)
+
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
     return username and USER_RE.match(username)
@@ -359,6 +398,8 @@ app = webapp2.WSGIApplication([('/', HomePage),
                                ('/blog/([0-9]+)/delete', DeletePost),
                                ('/blog/([0-9]+)/like', LikePost),
                                ('/blog/([0-9]+)/unlike', UnlikePost),
+                               ('/blog/([0-9]+)/editcomment', EditComment),
+                               ('/blog/([0-9]+)/deletecomment', DeleteComment),
                                ('/signup', Register),
                                ('/login', Login),
                                ('/logout', Logout),

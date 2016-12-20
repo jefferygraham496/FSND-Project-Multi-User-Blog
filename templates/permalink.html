@@ -7,8 +7,10 @@
   <a href="/blog/{{post.key().id()}}/like">Like: </a> {{post.likes}}
   <a href="/blog/{{post.key().id()}}/unlike">Unlike: </a> {{post.unlikes}}
   <br>
-  <a href="/blog/{{post.key().id()}}/edit">Edit Post</a>
-  <a href="/blog/{{post.key().id()}}/delete">Delete Post</a>
+  {% if user.name == post.user %}
+    <a href="/blog/{{post.key().id()}}/edit">Edit Post</a>
+    <a href="/blog/{{post.key().id()}}/delete">Delete Post</a>
+  {% endif %}
   <br>
   Comments:
   <br>
@@ -17,6 +19,7 @@
     <br>
     <a href="/blog/{{c.key().id()}}/editcomment">Edit Comment</a>
     <a href="/blog/{{c.key().id()}}/deletecomment">Delete Comment</a>
+    <div class="error">{{error}}</div>
     <br>
   {% endfor %}
 

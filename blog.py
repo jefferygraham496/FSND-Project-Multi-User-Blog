@@ -216,16 +216,23 @@ class EditPost(BlogHandler):
         post = db.get(key)
         post.subject = self.request.get('subject')
         post.content = self.request.get('content')
+        poster = post.user
         user = self.user.name
 
         input = self.request.get('submit')
 
-        if input == 'Submit': 
-            if post.subject and post.content:
-                post.put()
+        if user != poster:
+            msg = "You can only edit your own posts!"
+            self.render("editpost.html", subject=post.subject, content=post.content, error = msg)
+            if input == 'Cancel': 
                 self.redirect('/blog/%s' % post_id)
         else:
-            self.redirect('/blog/%s' % post_id)
+            if input == 'Submit': 
+                if post.subject and post.content:
+                    post.put()
+                    self.redirect('/blog/%s' % post_id)
+            else:
+                self.redirect('/blog/%s' % post_id)
 
 class DeletePost(BlogHandler):
     def get(self, post_id):
@@ -236,14 +243,22 @@ class DeletePost(BlogHandler):
     def post(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
+        poster = post.user
+        user = self.user.name
 
         input = self.request.get('submit')
 
-        if input == 'Delete':        
-            post.delete()
-            self.render('front.html')
+        if user != poster:
+            msg = "You can only delete your own posts!"
+            self.render("editpost.html", subject=post.subject, content=post.content, error = msg)
+            if input == 'Cancel': 
+                self.redirect('/blog/%s' % post_id)
         else:
-            self.redirect('/blog/%s' % post_id)
+            if input == 'Delete':        
+                post.delete()
+                self.render('front.html')
+            else:
+                self.redirect('/blog/%s' % post_id)
 
 class LikePost(BlogHandler):
     def get(self, post_id):

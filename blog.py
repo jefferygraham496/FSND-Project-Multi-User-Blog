@@ -264,17 +264,31 @@ class LikePost(BlogHandler):
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-        post.likes += 1
-        post.put()
-        self.redirect('/blog/%s' % post_id)
+        poster = post.user
+        user = self.user.name
+        params = dict(post = post)
+        if poster == user:
+            params['like_error'] = "You cannot like your own post!"
+            self.render('permalink.html', **params)
+        else:
+            post.likes += 1
+            post.put()
+            self.redirect('/blog/%s' % post_id)
 
 class UnlikePost(BlogHandler):
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-        post.unlikes += 1
-        post.put()
-        self.redirect('/blog/%s' % post_id)
+        poster = post.user
+        user = self.user.name
+        params = dict(post = post)
+        if poster == user:
+            params['like_error'] = "You cannot unlike your own post!"
+            self.render('permalink.html', **params)
+        else:
+            post.unlikes += 1
+            post.put()
+            self.redirect('/blog/%s' % post_id)
 
 class EditComment(BlogHandler):
     def get(self, comment_id):

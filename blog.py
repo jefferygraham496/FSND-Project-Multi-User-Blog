@@ -158,7 +158,7 @@ class PostPage(BlogHandler):
         params = dict(post = post)
 
         if Comment.all():
-            comments = db.GqlQuery("SELECT * FROM Comment ORDER BY created DESC")
+            comments = Comment.all().filter('post =', key)
             params['comments'] = comments
 
         if self.user:
@@ -283,7 +283,7 @@ class UnlikePost(BlogHandler):
         user = self.user.name
         params = dict(post = post)
         if poster == user:
-            params['like_error'] = "You cannot unlike your own post!"
+            params['like_error'] = "You cannot like your own post!"
             self.render('permalink.html', **params)
         else:
             post.unlikes += 1
@@ -300,15 +300,21 @@ class EditComment(BlogHandler):
         referer = str(self.request.cookies.get('referer'))
         comment = Comment.get_by_id(int(comment_id))
         comment.content = self.request.get('content')
-
+        user = self.user.name
+        commenter = comment.user
         input = self.request.get('submit')
-
-        if input == 'Submit': 
-            if comment.content:
-                comment.put()
+        if commenter != user:
+            msg = 'You can only edit your own comments!'
+            self.render('editcomment.html', content = comment.content, error = msg)
+            if input == 'Cancel': 
                 self.redirect(referer)
         else:
-            self.redirect(referer)
+            if input == 'Submit': 
+                if comment.content:
+                    comment.put()
+                    self.redirect(referer)
+            else:
+                self.redirect(referer)
 
 class DeleteComment(BlogHandler):
     def get(self, comment_id):
@@ -320,14 +326,20 @@ class DeleteComment(BlogHandler):
         referer = str(self.request.cookies.get('referer'))
         comment = Comment.get_by_id(int(comment_id))
         comment.content = self.request.get('content')
-
+        user = self.user.name
+        commenter = comment.user
         input = self.request.get('submit')
-
-        if input == 'Delete':        
-            comment.delete()
-            self.redirect(referer)
+        if commenter != user:
+            msg = 'You can only delete your own comments!'
+            self.render('deletecomment.html', content = comment.content, error = msg)
+            if input == 'Cancel': 
+                self.redirect(referer)
         else:
-            self.redirect(referer)
+            if input == 'Delete':        
+                comment.delete()
+                self.redirect(referer)
+            else:
+                self.redirect(referer)
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):

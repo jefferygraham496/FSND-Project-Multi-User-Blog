@@ -4,9 +4,9 @@
   {{post.render() | safe}}
   <br>
   <br>
-    <a href="/blog/{{post.key().id()}}/like">Like: </a> {{post.likes}}
-    <a href="/blog/{{post.key().id()}}/unlike">Unlike: </a> {{post.unlikes}}
-    <div class="error">{{like_error}}</div>
+  <a href="/blog/{{post.key().id()}}/like">Like: </a> {{post.likes}}
+  <a href="/blog/{{post.key().id()}}/unlike">Unlike: </a> {{post.unlikes}}
+  <div class="error">{{like_error}}</div>
   <br>
   {% if user.name == post.user %}
     <a href="/blog/{{post.key().id()}}/edit">Edit Post</a>
@@ -16,11 +16,12 @@
   Comments:
   <br>
   {% for c in comments %}
+    On {{c.created}}, {{ c.user }} wrote:
+    <br>
     {{c.content | safe}}
     <br>
     <a href="/blog/{{c.key().id()}}/editcomment">Edit Comment</a>
     <a href="/blog/{{c.key().id()}}/deletecomment">Delete Comment</a>
-    <div class="error">{{error}}</div>
     <br>
   {% endfor %}
 

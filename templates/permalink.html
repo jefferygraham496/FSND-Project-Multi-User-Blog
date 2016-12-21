@@ -7,6 +7,7 @@
   <a href="/blog/{{post.key().id()}}/like">Like: </a> {{post.likes}}
   <a href="/blog/{{post.key().id()}}/unlike">Unlike: </a> {{post.unlikes}}
   <div class="error">{{like_error}}</div>
+  <div class="error">{{like_count_error}}</div>
   <br>
   {% if user.name == post.user %}
     <a href="/blog/{{post.key().id()}}/edit">Edit Post</a>

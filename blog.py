@@ -128,6 +128,7 @@ class Post(db.Model):
     user = db.StringProperty()
     likes = db.IntegerProperty()
     unlikes = db.IntegerProperty()
+    rated_by = db.ListProperty(str)
 
     def render(self):
         self._render_text = self.content.replace('\n', '<br>')
@@ -198,7 +199,7 @@ class NewPost(BlogHandler):
         user = self.user.name
 
         if subject and content:
-            p = Post(parent = blog_key(), subject = subject, content = content, user = user, likes = 0, unlikes = 0)
+            p = Post(parent = blog_key(), subject = subject, content = content, user = user, likes = 0, unlikes = 0, rated_by = [])
             p.put()
             self.redirect('/blog/%s' % str(p.key().id()))
         else:
@@ -271,9 +272,14 @@ class LikePost(BlogHandler):
             params['like_error'] = "You cannot like your own post!"
             self.render('permalink.html', **params)
         else:
-            post.likes += 1
-            post.put()
-            self.redirect('/blog/%s' % post_id)
+            post.rated_by.append(user)
+            if user in post.rated_by:
+                params['like_count_error'] = "You can only vote on a post once!"
+                self.render('permalink.html', **params)
+            else:
+                post.likes += 1
+                post.put()
+                self.redirect('/blog/%s' % post_id)
 
 class UnlikePost(BlogHandler):
     def get(self, post_id):
@@ -286,9 +292,14 @@ class UnlikePost(BlogHandler):
             params['like_error'] = "You cannot like your own post!"
             self.render('permalink.html', **params)
         else:
-            post.unlikes += 1
-            post.put()
-            self.redirect('/blog/%s' % post_id)
+            post.rated_by.append(user)
+            if user in post.rated_by:
+                params['like_count_error'] = "You can only vote on a post once!"
+                self.render('permalink.html', **params)
+            else:
+                post.unlikes += 1
+                post.put()
+                self.redirect('/blog/%s' % post_id)
 
 class EditComment(BlogHandler):
     def get(self, comment_id):

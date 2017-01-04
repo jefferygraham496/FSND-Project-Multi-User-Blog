@@ -4,13 +4,13 @@
   {{post.render() | safe}}
   <br>
   <br>
-  <a href="/blog/{{post.key().id()}}/like">Like: </a> {{post.likes}}
+  <a href="/blog/{{post.key().id()}}/like">Like: </a> {{post.likes}} |
   <a href="/blog/{{post.key().id()}}/unlike">Unlike: </a> {{post.unlikes}}
   <div class="error">{{like_error}}</div>
   <div class="error">{{like_count_error}}</div>
   <br>
   {% if user.name == post.user %}
-    <a href="/blog/{{post.key().id()}}/edit">Edit Post</a>
+    <a href="/blog/{{post.key().id()}}/edit">Edit Post</a> |
     <a href="/blog/{{post.key().id()}}/delete">Delete Post</a>
   {% endif %}
   <br>
@@ -21,7 +21,7 @@
     <br>
     {{c.content | safe}}
     <br>
-    <a href="/blog/{{c.key().id()}}/editcomment">Edit Comment</a>
+    <a href="/blog/{{c.key().id()}}/editcomment">Edit Comment</a> |
     <a href="/blog/{{c.key().id()}}/deletecomment">Delete Comment</a>
     <br>
   {% endfor %}

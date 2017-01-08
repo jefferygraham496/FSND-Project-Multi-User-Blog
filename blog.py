@@ -352,14 +352,19 @@ class EditComment(BlogHandler):
     def get(self, comment_id):
         self.response.headers.add_header('Set-Cookie', 'referer=%s; Path=/' % self.request.referer)
         comment = Comment.get_by_id(int(comment_id))
-        self.render('editcomment.html', content=comment.content)
+        if comment and self.user:
+            self.render('editcomment.html', content=comment.content)
+        else:
+            self.redirect("/login")
+            return
 
     def post(self, comment_id):
         referer = str(self.request.cookies.get('referer'))
         comment = Comment.get_by_id(int(comment_id))
         comment.content = self.request.get('content')
-        user = self.user.name
-        commenter = comment.user
+        if comment and self.user:
+            user = self.user.name
+            commenter = comment.user
         input = self.request.get('submit')
         if commenter != user:
             msg = 'You can only edit your own comments!'

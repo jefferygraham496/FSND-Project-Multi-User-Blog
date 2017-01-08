@@ -328,8 +328,11 @@ class UnlikePost(BlogHandler):
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-        poster = post.user
-        user = self.user.name
+        if post and self.user:
+            poster = post.user
+            user = self.user.name
+        else:
+            self.redirect('/login')
         params = dict(post=post)
         if poster == user:
             params['like_error'] = "You cannot like your own post!"

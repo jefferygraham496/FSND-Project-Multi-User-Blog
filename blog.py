@@ -303,50 +303,50 @@ class DeletePost(BlogHandler):
 # # handler for liking user posts
 class LikePost(BlogHandler):
     def get(self, post_id):
-        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-        post = db.get(key)
-        if post and self.user:
+        if not self.user:
+            self.redirect('/login')
+        else:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
             poster = post.user
             user = self.user.name
-        else:
-            self.redirect('/login')
-        params = dict(post=post)
-        if poster == user:
-            params['like_error'] = "You cannot like your own post!"
-            self.render('permalink.html', **params)
-        else:
-            if user in post.rated_by:
-                params['like_count_error'] = "You can only vote on a post once!"
+            params = dict(post=post)
+            if poster == user:
+                params['like_error'] = "You cannot like your own post!"
                 self.render('permalink.html', **params)
             else:
-                post.rated_by.append(user)
-                post.likes += 1
-                post.put()
-                self.redirect('/blog/%s' % post_id)
+                if user in post.rated_by:
+                    params['like_count_error'] = "You can only vote on a post once!"
+                    self.render('permalink.html', **params)
+                else:
+                    post.rated_by.append(user)
+                    post.likes += 1
+                    post.put()
+                    self.redirect('/blog/%s' % post_id)
 
 # handler for disliking user posts
 class UnlikePost(BlogHandler):
     def get(self, post_id):
-        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-        post = db.get(key)
-        if post and self.user:
+        if not self.user:
+            self.redirect('/login')
+        else:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
             poster = post.user
             user = self.user.name
-        else:
-            self.redirect('/login')
-        params = dict(post=post)
-        if poster == user:
-            params['like_error'] = "You cannot like your own post!"
-            self.render('permalink.html', **params)
-        else:
-            if user in post.rated_by:
-                params['like_count_error'] = "You can only vote on a post once!"
+            params = dict(post=post)
+            if poster == user:
+                params['like_error'] = "You cannot like your own post!"
                 self.render('permalink.html', **params)
             else:
-                post.rated_by.append(user)
-                post.unlikes += 1
-                post.put()
-                self.redirect('/blog/%s' % post_id)
+                if user in post.rated_by:
+                    params['like_count_error'] = "You can only vote on a post once!"
+                    self.render('permalink.html', **params)
+                else:
+                    post.rated_by.append(user)
+                    post.unlikes += 1
+                    post.put()
+                    self.redirect('/blog/%s' % post_id)
 
 # handler for editing comments
 class EditComment(BlogHandler):

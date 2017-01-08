@@ -175,6 +175,9 @@ class PostPage(BlogHandler):
         self.render("permalink.html", **params)
 
     def post(self, post_id):
+        if not self.user:
+            self.redirect('/blog')
+
         comment_content = self.request.get('content')
 
         if comment_content:
@@ -192,7 +195,8 @@ class NewPost(BlogHandler):
         if self.user:
             self.render("newpost.html")
         else:
-            self.redirect("/login")
+            self.redirect("/blog")
+            return
 
     def post(self):
         if not self.user:
@@ -223,17 +227,23 @@ class EditPost(BlogHandler):
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-        self.render("editpost.html",
-                    subject=post.subject,
-                    content=post.content)
+        if post and self.user and (self.user.name == post.user):
+            self.render("editpost.html",
+                        subject=post.subject,
+                        content=post.content)
+        else:
+            self.redirect("/blog")
+            return
 
     def post(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-        post.subject = self.request.get('subject')
-        post.content = self.request.get('content')
-        poster = post.user
-        user = self.user.name
+
+        if post and self.user:
+            post.subject = self.request.get('subject')
+            post.content = self.request.get('content')
+            poster = post.user
+            user = self.user.name
 
         input = self.request.get('submit')
 

@@ -232,7 +232,7 @@ class EditPost(BlogHandler):
                         subject=post.subject,
                         content=post.content)
         else:
-            self.redirect("/blog")
+            self.redirect("/login")
             return
 
     def post(self, post_id):
@@ -270,6 +270,9 @@ class DeletePost(BlogHandler):
             self.render("deletepost.html",
                         subject=post.subject,
                         content=post.content)
+        else:
+            self.redirect("/login")
+            return
 
     def post(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
@@ -301,8 +304,11 @@ class LikePost(BlogHandler):
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-        poster = post.user
-        user = self.user.name
+        if post and self.user:
+            poster = post.user
+            user = self.user.name
+        else:
+            self.redirect('/login')
         params = dict(post=post)
         if poster == user:
             params['like_error'] = "You cannot like your own post!"

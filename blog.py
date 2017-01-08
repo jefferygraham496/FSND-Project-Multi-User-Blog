@@ -266,15 +266,18 @@ class DeletePost(BlogHandler):
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-        self.render("deletepost.html",
-                    subject=post.subject,
-                    content=post.content)
+        if post and self.user and (self.user.name == post.user):
+            self.render("deletepost.html",
+                        subject=post.subject,
+                        content=post.content)
 
     def post(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
-        poster = post.user
-        user = self.user.name
+
+        if post and self.user:
+            poster = post.user
+            user = self.user.name
 
         input = self.request.get('submit')
 
